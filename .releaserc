@@ -16,22 +16,6 @@
       { "cmd": "echo ${nextRelease.version} > VERSION" }
     ]
   ],
-  "prepare": [
-    [
-      "@semantic-release/exec",
-      { "cmd": "./gradlew versionAsSpecified --scan -PnewVersion=${nextRelease.version}" }
-    ],
-    [
-      "@semantic-release/git",
-      {
-        "assets": [
-          "gradle.properties",
-          "charts/fullstack-deployment/Chart.yaml",
-          "charts/fullstack-cluster-setup/Chart.yaml"
-        ]
-      }
-    ]
-  ],
   "branches":[
     {
       "name": "main"
