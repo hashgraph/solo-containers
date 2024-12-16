@@ -25,7 +25,7 @@
 
 # Protect the repository root files
 /README.md                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
-**/LICENSE                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
+**/LICENSE                                      @hashgraph/release-engineering-managers
 
 # Git Ignore definitions
 **/.gitignore                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/devops-ci
