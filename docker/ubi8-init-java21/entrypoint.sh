@@ -55,6 +55,10 @@ if [[ "${JCP_OVERRIDDEN}" != true && "${JAVA_MAIN_CLASS}" != "com.swirlds.platfo
   JAVA_CLASS_PATH="${JAVA_CLASS_PATH}:data/apps/*"
 fi
 
+# Setup Consensus Node Arguments
+CONSENSUS_NODE_ARGS=""
+[[ -n "${CONSENSUS_NODE_ID}" && "${CONSENSUS_NODE_ID}" -ge 0 ]] && CONSENSUS_NODE_ARGS="-local ${CONSENSUS_NODE_ID}"
+
 # Override Log Directory Name (if provided)
 LOG_DIR_NAME="${LOG_DIR_NAME:-output}"
 
@@ -104,8 +108,8 @@ echo
 
 set +e
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BEGIN NODE OUTPUT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-echo "command: /usr/bin/env java ${JAVA_HEAP_OPTS} ${JAVA_OPTS} -cp """${JAVA_CLASS_PATH}""" """${JAVA_MAIN_CLASS}""""
-/usr/bin/env java ${JAVA_HEAP_OPTS} ${JAVA_OPTS} -cp "${JAVA_CLASS_PATH}" "${JAVA_MAIN_CLASS}"
+echo "command: /usr/bin/env java ${JAVA_HEAP_OPTS} ${JAVA_OPTS} -cp \"${JAVA_CLASS_PATH}\" \"${JAVA_MAIN_CLASS}\" ${CONSENSUS_NODE_ARGS}"
+/usr/bin/env java ${JAVA_HEAP_OPTS} ${JAVA_OPTS} -cp "${JAVA_CLASS_PATH}" "${JAVA_MAIN_CLASS}" ${CONSENSUS_NODE_ARGS}
 EC="${?}"
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< END NODE OUTPUT   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 
