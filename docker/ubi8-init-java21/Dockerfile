@@ -94,6 +94,7 @@ RUN mkdir -p "/opt/hgcapp" && \
     mkdir -p "/opt/hgcapp/recordStreams" && \
     mkdir -p "/opt/hgcapp/services-hedera" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0" && \
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/start" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/apps" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/config" && \
@@ -104,11 +105,11 @@ RUN mkdir -p "/opt/hgcapp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade"
 
 # Add the entrypoint script and systemd service file
-ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
+ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/start
 ADD network-node.service /usr/lib/systemd/system/
 
 # Ensure proper file permissions
-RUN chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh && \
+RUN chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/start/entrypoint.sh && \
     chown -R 2000:2000 /opt/hgcapp/
 
 RUN mkdir -p /etc/network-node && \
