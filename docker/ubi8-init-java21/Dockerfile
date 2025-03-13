@@ -116,7 +116,9 @@ RUN mkdir -p /etc/network-node && \
     chown -R 2000:2000 /etc/network-node
 
 RUN mkdir -p /etc/network-node/startup && \
-    chown -R 2000:2000 /etc/network-node/startup
+    chown -R 2000:2000 /etc/network-node/startup && \
+    mkdir -p /etc/network-node/config && \
+    chown -R 2000:2000 /etc/network-node/config
 ADD stage_files.sh /etc/network-node/startup
 RUN chmod -R +x /etc/network-node/startup/stage_files.sh
 
