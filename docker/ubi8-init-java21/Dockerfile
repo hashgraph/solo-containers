@@ -115,6 +115,11 @@ RUN mkdir -p /etc/network-node && \
     touch /etc/network-node/application.env && \
     chown -R 2000:2000 /etc/network-node
 
+RUN mkdir -p /etc/network-node/startup && \
+    chown -R 2000:2000 /etc/network-node/startup
+ADD stage_files.sh /etc/network-node/startup
+RUN chmod -R +x /etc/network-node/startup/stage_files.sh
+
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
 
