@@ -18,4 +18,4 @@
 
 set -eo pipefail
 
-cp -rL /hapi-app-config/* /opt/hgcapp/services-hedera/HapiApp2.0/
+cp -rL /etc/network-node/config/* /opt/hgcapp/services-hedera/HapiApp2.0/
