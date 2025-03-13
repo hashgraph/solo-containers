@@ -17,7 +17,7 @@
 ########################################################################################################################
 
 set -eo pipefail
-files=("config.txt" "settings.txt" "log4j2.xml")
+files=$(ls -1 /etc/network-node/config)
 for file in "${files[@]}"; do
   if [ -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}" ]; then
     rm -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
