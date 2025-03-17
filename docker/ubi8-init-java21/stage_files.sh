@@ -26,4 +26,6 @@ for file in $files; do
 done
 
 # copy hedera.crt and hedera.key to /opt/hgcapp/services-hedera/HapiApp2.0/
-cp /shared-hapiapp/hedera.* /opt/hgcapp/services-hedera/HapiApp2.0/
+if [ -d /shared-hapiapp ]; then
+  cp /shared-hapiapp/hedera.* /opt/hgcapp/services-hedera/HapiApp2.0/
+fi
