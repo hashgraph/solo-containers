@@ -18,9 +18,14 @@
 
 set -eo pipefail
 files=$(ls -1 /etc/network-node/config)
-for file in "${files[@]}"; do
+for file in $files; do
   if [ -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}" ]; then
     rm -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
   fi
   ln -s "/etc/network-node/config/${file}" "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
 done
+
+# copy hedera.crt and hedera.key to /opt/hgcapp/services-hedera/HapiApp2.0/
+if [ -d /shared-hapiapp ]; then
+  cp /shared-hapiapp/hedera.* /opt/hgcapp/services-hedera/HapiApp2.0/
+fi
