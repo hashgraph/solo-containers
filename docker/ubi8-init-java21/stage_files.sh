@@ -25,7 +25,8 @@ for file in $files; do
   ln -s "/etc/network-node/config/${file}" "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
 done
 
-# copy hedera.crt and hedera.key to /opt/hgcapp/services-hedera/HapiApp2.0/
-if [ -d /shared-hapiapp ]; then
-  cp /shared-hapiapp/hedera.* /opt/hgcapp/services-hedera/HapiApp2.0/
+# copy hedera.crt and hedera.key to /opt/hgcapp/services-hedera/HapiApp2.0/ if /shared-hapiapp exists and is not empty
+if [ -d "/shared-hapiapp" ] && [ "$(ls -A /shared-hapiapp)" ]; then
+  cp /shared-hapiapp/* /opt/hgcapp/services-hedera/HapiApp2.0/
 fi
+
