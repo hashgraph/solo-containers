@@ -1,0 +1,1 @@
+gcr.io/hedera-registry/hedera-backups
