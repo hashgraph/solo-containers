@@ -30,7 +30,10 @@ if [[ -z "${JAVA_OPTS}" ]]; then
 fi
 
 # Fix for M4 chips
-JAVA_OPTS="${JAVA_OPTS} -XX:UseSVE=0"
+ARCH="$(uname -p)"
+if [[ "${ARCH}" == "amd64" || "${ARCH}" == "aarch64" ]]; then
+  JAVA_OPTS="${JAVA_OPTS} -XX:UseSVE=0"
+fi
 
 # Setup Heap Options
 JAVA_HEAP_OPTS=""
