@@ -1,0 +1,3 @@
+# backup
+*/10 * * * * root /backup.sh
+# backup
