@@ -29,6 +29,12 @@ if [[ -z "${JAVA_OPTS}" ]]; then
   JAVA_OPTS=""
 fi
 
+# Fix for M4 chips
+ARCH="$(uname -p)"
+if [[ "${ARCH}" == "amd64" || "${ARCH}" == "aarch64" ]]; then
+  JAVA_OPTS="${JAVA_OPTS} -XX:UseSVE=0"
+fi
+
 # Setup Heap Options
 JAVA_HEAP_OPTS=""
 
@@ -102,7 +108,7 @@ echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< END USER IDENT   <<<<<<<<<<<<<<<
 echo
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BEGIN JAVA VERSION >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-/usr/bin/env java -version
+/usr/bin/env java ${JAVA_OPTS} -version
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< END JAVA VERSION   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo
 
