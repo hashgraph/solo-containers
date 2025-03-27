@@ -30,7 +30,7 @@ if [[ -z "${JAVA_OPTS}" ]]; then
 fi
 
 # Fix for M4 chips
-JAVA_OPTS+=" -XX:UseSVE=0"
+JAVA_OPTS="${JAVA_OPTS} -XX:UseSVE=0"
 
 # Setup Heap Options
 JAVA_HEAP_OPTS=""
