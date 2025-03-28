@@ -31,7 +31,7 @@ fi
 
 # Fix for M4 chips
 ARCH="$(uname -p)"
-if [[ "${ARCH}" == "amd64" || "${ARCH}" == "aarch64" ]]; then
+if [[ "${ARCH}" == "arm64" || "${ARCH}" == "aarch64" ]]; then
   JAVA_OPTS="${JAVA_OPTS} -XX:UseSVE=0"
 fi
 
