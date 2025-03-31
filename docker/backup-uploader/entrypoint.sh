@@ -8,6 +8,6 @@ do
     #
     # 1. all environment variables are passed in
     # 2. ensure multiple copies can't be running (as there is no copy)
-    ( . ./backup.sh)
+    ( . /app/backup.sh)
     sleep 300
 done

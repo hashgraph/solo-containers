@@ -26,7 +26,7 @@ val appVersion = project.version.toString()
 docker {
     name = "${repo}/${registry}/${containerName}:${appVersion}"
     version = appVersion
-    files("entrypoint.sh")
+    files("/app/entrypoint.sh")
     buildx(true)
     if (!System.getenv("CI").isNullOrEmpty()) {
         platform("linux/arm64", "linux/amd64")
