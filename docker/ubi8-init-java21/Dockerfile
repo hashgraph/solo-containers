@@ -19,7 +19,7 @@ FROM registry.access.redhat.com/ubi8/ubi-init:latest
 ENV LC_ALL=C.UTF-8
 
 # Define JDK Environment Variables
-ENV JAVA_VERSION "jdk-21.0.1+12"
+ENV JAVA_VERSION "jdk-21.0.7+6"
 ENV JAVA_HOME /usr/local/java
 ENV PATH ${JAVA_HOME}/bin:${PATH}
 
@@ -42,7 +42,7 @@ ENV LOG_DIR_NAME ""
 
 RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     /usr/bin/crb enable && \
-    dnf -y install binutils libsodium openssl zlib readline tzdata gzip tar ca-certificates curl && \
+    dnf -y install binutils libsodium openssl zlib readline tzdata gzip tar ca-certificates curl zip unzip && \
     dnf clean all
 
 # Install Java 21 Adoptium JDK
@@ -50,16 +50,16 @@ RUN set -eux; \
         ARCH="$(objdump="$(command -v objdump)" && objdump --file-headers "$objdump" | awk -F '[:,]+[[:space:]]+' '$1 == "architecture" { print $2 }')"; \
         case "${ARCH}" in \
            aarch64|arm64) \
-             ESUM='e184dc29a6712c1f78754ab36fb48866583665fa345324f1a79e569c064f95e9'; \
-             BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.1_12.tar.gz'; \
+             ESUM='31dba70ba928c78c20d62049ac000f79f7a7ab11f9d9c11e703f52d60aa64f93'; \
+             BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.7_6.tar.gz'; \
              ;; \
           amd64|i386:x86-64) \
-            ESUM='1a6fa8abda4c5caed915cfbeeb176e7fbd12eb6b222f26e290ee45808b529aa1'; \
-            BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jdk_x64_linux_hotspot_21.0.1_12.tar.gz'; \
+            ESUM='974d3acef0b7193f541acb61b76e81670890551366625d4f6ca01b91ac152ce0'; \
+            BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_x64_linux_hotspot_21.0.7_6.tar.gz'; \
             ;; \
            ppc64el|powerpc:common64) \
-             ESUM='9574828ef3d735a25404ced82e09bf20e1614f7d6403956002de9cfbfcb8638f'; \
-             BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.1_12.tar.gz'; \
+             ESUM='2ddc0dc14b07d9e853875aac7f84c23826fff18b9cea618c93efe0bcc8f419c2'; \
+             BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.7_6.tar.gz'; \
              ;; \
            *) \
              echo "Unsupported arch: ${ARCH}"; \
