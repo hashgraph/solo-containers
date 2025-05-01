@@ -45,6 +45,10 @@ RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.n
     dnf -y install binutils libsodium openssl zlib readline tzdata gzip tar ca-certificates curl zip unzip && \
     dnf clean all
 
+# Install zip and unzip
+RUN dnf -y install zip-3.0-23.el8 unzip-6.0-47.el8_10 && \
+    dnf clean all
+
 # Install Java 21 Adoptium JDK
 RUN set -eux; \
         ARCH="$(objdump="$(command -v objdump)" && objdump --file-headers "$objdump" | awk -F '[:,]+[[:space:]]+' '$1 == "architecture" { print $2 }')"; \
