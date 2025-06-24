@@ -105,6 +105,7 @@ RUN mkdir -p "/opt/hgcapp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/lib" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/stats" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/saved" && \
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/tmp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade"
 
 # Add the entrypoint script and systemd service file
