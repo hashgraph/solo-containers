@@ -46,7 +46,7 @@ RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.n
     dnf clean all
 
 # Install zip and unzip
-RUN dnf -y install zip-3.0-23.el8 unzip-6.0-47.el8_10 && \
+RUN dnf -y install zip unzip && \
     dnf clean all
 
 # Install Java 21 Adoptium JDK
