@@ -4,7 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-Restart=no
+Restart=on-failure
+StartLimitIntervalSec=0
 User=hedera
 Group=hedera
 
@@ -15,5 +16,7 @@ WorkingDirectory=/opt/hgcapp/services-hedera/HapiApp2.0
 ExecStartPre=/usr/bin/bash /etc/network-node/startup/stage_files.sh
 ExecStart=/usr/bin/bash /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh
 
+WatchdogSec=30
+NotifyAccess=all
 [Install]
 WantedBy=multi-user.target
