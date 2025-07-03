@@ -100,7 +100,6 @@ RUN mkdir -p "/opt/hgcapp" && \
 # Add the entrypoint script and systemd service file
 ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
 ADD network-node.service /usr/lib/systemd/system/
-RUN systemctl enable network-node.service
 
 # Ensure proper file permissions
 RUN chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh && \
