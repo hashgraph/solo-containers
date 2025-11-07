@@ -127,8 +127,6 @@ RUN mkdir -p /etc/network-node/startup && \
     chown -R 2000:2000 /etc/network-node/config
 ADD stage_files.sh /etc/network-node/startup
 RUN chmod -R +x /etc/network-node/startup/stage_files.sh
-# Update to address error in Consensus Node with > v0.68.0-rc1
-RUN echo 220000 > /proc/sys/vm/max_map_count
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
