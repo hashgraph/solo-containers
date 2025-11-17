@@ -5,6 +5,7 @@ set -euo pipefail
 STATE_FILE="/var/lib/hedera/node-state"
 LOCK_FILE="/var/lock/hedera-node.lock"
 LOG_FILE="/opt/hgcapp/services-hedera/HapiApp2.0/output/node_state_manager.log"
+MARKER_FILE="/var/lib/hedera/systemctl-enabled.marker"
 
 current_systemctl_status() {
   echo "===== Systemctl Status of network-node.service =====" | tee -a "$LOG_FILE"
@@ -36,7 +37,9 @@ case "$1" in
         case "$STATE" in
             UNCONFIGURED)
                 set_state "RUNNING"
-                systemctl start network-node.service | tee -a "$LOG_FILE"
+                systemctl enable network-node.service | tee -a "$LOG_FILE"
+                systemctl restart network-node.service | tee -a "$LOG_FILE"
+                touch "$MARKER_FILE"
                 ;;
             STOPPED)
                 echo "Node is intentionally stopped, not starting" | tee -a "$LOG_FILE"
@@ -47,7 +50,9 @@ case "$1" in
                 exit 0
                 ;;
             RUNNING)
-                systemctl start network-node.service | tee -a "$LOG_FILE"
+                systemctl enable network-node.service | tee -a "$LOG_FILE"
+                systemctl restart network-node.service | tee -a "$LOG_FILE"
+                touch "$MARKER_FILE"
                 ;;
         esac
         sleep 5
@@ -59,7 +64,8 @@ case "$1" in
         flock -n 200 || exit 1
 
         set_state "STOPPED"
-        systemctl stop network-node.service | tee -a "$LOG_FILE"
+        systemctl disable --now network-node.service | tee -a "$LOG_FILE"
+        rm -f "$MARKER_FILE"
         sleep 5
         current_systemctl_status
         ;;
@@ -69,7 +75,8 @@ case "$1" in
         flock -n 200 || exit 1
 
         set_state "MAINTENANCE"
-        systemctl stop network-node.service | tee -a "$LOG_FILE"
+        systemctl disable --now network-node.service | tee -a "$LOG_FILE"
+        rm -f "$MARKER_FILE"
         sleep 5
         current_systemctl_status
         ;;
