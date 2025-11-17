@@ -66,7 +66,7 @@ RUN set -eux; \
              BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.7_6.tar.gz'; \
              ;; \
            *) \
-             echo "Unsupported arch: ${ARCH}"; \
+             echo "Unsupported architecture: ${ARCH}"; \
              exit 1; \
              ;; \
         esac; \
@@ -106,15 +106,17 @@ RUN mkdir -p "/opt/hgcapp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/stats" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/saved" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/tmp" && \
-    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade"
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade" && \
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output"
 
 # Add the entrypoint script and systemd service file
 ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
+ADD node_state_manager.sh /opt/hgcapp/services-hedera/HapiApp2.0/
 ADD network-node.service /usr/lib/systemd/system/
-RUN systemctl enable network-node.service
 
 # Ensure proper file permissions
 RUN chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh && \
+    chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/node_state_manager.sh && \
     chown -R 2000:2000 /opt/hgcapp/
 
 RUN mkdir -p /etc/network-node && \
@@ -127,6 +129,11 @@ RUN mkdir -p /etc/network-node/startup && \
     chown -R 2000:2000 /etc/network-node/config
 ADD stage_files.sh /etc/network-node/startup
 RUN chmod -R +x /etc/network-node/startup/stage_files.sh
+
+RUN mkdir -p /var/lib/hedera && \
+    chown -R 2000:2000 /var/lib/hedera && \
+    mkdir -p /var/lock && \
+    chown -R 2000:2000 /var/lock
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
