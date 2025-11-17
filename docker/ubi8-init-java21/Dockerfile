@@ -106,7 +106,8 @@ RUN mkdir -p "/opt/hgcapp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/stats" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/saved" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/tmp" && \
-    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade"
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade" && \
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output"
 
 # Add the entrypoint script and systemd service file
 ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
@@ -128,6 +129,11 @@ RUN mkdir -p /etc/network-node/startup && \
     chown -R 2000:2000 /etc/network-node/config
 ADD stage_files.sh /etc/network-node/startup
 RUN chmod -R +x /etc/network-node/startup/stage_files.sh
+
+RUN mkdir -p /var/lib/hedera && \
+    chown -R 2000:2000 /var/lib/hedera && \
+    mkdir -p /var/lock && \
+    chown -R 2000:2000 /var/lock
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
