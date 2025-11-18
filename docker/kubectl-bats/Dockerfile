@@ -14,22 +14,20 @@
 # limitations under the License.
 #
 
-FROM bitnami/kubectl:latest
+FROM dtzar/helm-kubectl:latest
 
 ENV BATS_HOME=/bats
 
-# switch to user root for setup
+# switch to root
 USER root
 
-# setup bats
-RUN apt-get update && \
-    apt-get install -y curl git vim python3 python3-pip jq && \
+RUN apk update && \
+    apk add --no-cache curl git vim python3 py3-pip jq bash && \
     git clone https://github.com/bats-core/bats-core.git "${BATS_HOME}"/bats-core && \
     git clone https://github.com/bats-core/bats-support.git "${BATS_HOME}"/test_helper/bats-support && \
     git clone https://github.com/bats-core/bats-assert.git "${BATS_HOME}"/test_helper/bats-assert && \
-    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
     curl -L https://github.com/mikefarah/yq/releases/download/v4.34.2/yq_linux_amd64 -o /usr/bin/yq && \
     chmod +x /usr/bin/yq
 
-#switch back to user 1001
+# switch back to non-root user (if image has a non-root user)
 USER 1001
