@@ -19,26 +19,26 @@ FROM registry.access.redhat.com/ubi8/ubi-init:latest
 ENV LC_ALL=C.UTF-8
 
 # Define JDK Environment Variables
-ENV JAVA_VERSION "jdk-21.0.7+6"
-ENV JAVA_HOME /usr/local/java
-ENV PATH ${JAVA_HOME}/bin:${PATH}
+ENV JAVA_VERSION="jdk-21.0.7+6"
+ENV JAVA_HOME=/usr/local/java
+ENV PATH=${JAVA_HOME}/bin:${PATH}
 
 # Define Application Environment Variables
 ENV APP_HOME="/opt/hgcapp/services-hedera/HapiApp2.0"
 ENV JAVA_HEAP_MIN=""
 ENV JAVA_HEAP_MAX=""
 ENV JAVA_OPTS=""
-ENV JAVA_MAIN_CLASS ""
-ENV JAVA_CLASS_PATH ""
+ENV JAVA_MAIN_CLASS=""
+ENV JAVA_CLASS_PATH=""
 
 ## Consensus Node Configuration
 ENV CONSENSUS_NODE_ID=""
 
 # Performance Tuning for Malloc
-ENV MALLOC_ARENA_MAX 4
+ENV MALLOC_ARENA_MAX=4
 
 # Log Folder Name Override
-ENV LOG_DIR_NAME ""
+ENV LOG_DIR_NAME=""
 
 RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     /usr/bin/crb enable && \

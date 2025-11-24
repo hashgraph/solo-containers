@@ -15,7 +15,7 @@
 #
 
 FROM registry.access.redhat.com/ubi8/ubi-init:latest
-ENV COMPOSE_VERSION 2.19.0
+ENV COMPOSE_VERSION=2.19.0
 
 RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     /usr/bin/crb enable && \
