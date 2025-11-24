@@ -1,8 +1,6 @@
 [Unit]
 Description=Hedera Network Node
 After=network.target
-# don't attempt to start until the marker exists
-ConditionPathExists=/var/lib/hedera/systemctl-enabled.marker
 
 [Service]
 Type=simple
