@@ -42,11 +42,20 @@ ENV LOG_DIR_NAME ""
 
 RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     /usr/bin/crb enable && \
-    dnf -y install binutils libsodium openssl zlib readline tzdata gzip tar ca-certificates curl zip unzip && \
-    dnf clean all
-
-# Install zip and unzip
-RUN dnf -y install zip unzip && \
+    dnf -y install \
+        binutils \
+        libsodium \
+        openssl \
+        zlib \
+        readline \
+        tzdata \
+        gzip \
+        tar \
+        ca-certificates \
+        curl \
+        zip \
+        unzip \
+        sudo && \
     dnf clean all
 
 # Install Java 21 Adoptium JDK
@@ -81,8 +90,7 @@ RUN set -eux; \
     	  ; \
     rm -f /tmp/openjdk.tar.gz /usr/local/java/lib/src.zip;
 
-RUN dnf -y install sudo && \
-    echo >> /etc/sudoers && \
+RUN echo >> /etc/sudoers && \
     echo "%hedera ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Configure the standard user account
@@ -126,6 +134,7 @@ RUN mkdir -p /etc/network-node/startup && \
     mkdir -p /etc/network-node/config && \
     chown -R 2000:2000 /etc/network-node/config
 ADD stage_files.sh /etc/network-node/startup
+
 RUN chmod -R +x /etc/network-node/startup/stage_files.sh
 
 # Expose TCP/UDP Port Definitions
