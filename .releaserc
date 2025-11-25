@@ -12,16 +12,24 @@
         "preset": "conventionalcommits"
       }
     ],
-    "@semantic-release/git",
-    "@semantic-release/github"
-  ],
-  "verifyRelease": [
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "VERSION"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}\n\nSigned-off-by: semantic-release-bot <semantic-release@hashgraph.com>"
+      }
+    ],
     [
       "@semantic-release/exec",
-      { "cmd": "echo ${nextRelease.version} > VERSION" }
-    ]
+      {
+        "prepareCmd": "echo ${nextRelease.version} > VERSION"
+      }
+    ],
+    "@semantic-release/github"
   ],
-  "branches":[
+  "branches": [
     {
       "name": "main"
     },
