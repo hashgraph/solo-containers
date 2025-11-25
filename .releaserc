@@ -16,15 +16,11 @@
       "@semantic-release/exec",
       {
         "verifyReleaseCmd": "echo ${nextRelease.version} > VERSION",
-        "prepareCmd": "echo ${nextRelease.version} > VERSION"
+        "prepareCmd": "echo ${nextRelease.version} > VERSION",
+        "publishCmd": "git tag -s -m '${nextRelease.version}' ${nextRelease.version} && git push origin ${nextRelease.version}"
       }
     ],
-    [
-      "@semantic-release/git",
-      {
-        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-      }
-    ],
+    "@semantic-release/git",
     "@semantic-release/github"
   ],
   "branches": [
