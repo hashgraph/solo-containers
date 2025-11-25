@@ -179,7 +179,7 @@ jobs:
       - name: Import and Configure GPG key
         id: gpg_key
         run: |
-          echo "${{ secrets.GPG_KEY_CONTENTS }}" | base64 --decode | gpg --batch --import
+          echo "${{ secrets.GPG_KEY_CONTENTS }}" | gpg --batch --import
           rm -rf /tmp/gpg.sh
           echo '#!/bin/bash' >> /tmp/gpg.sh
           echo 'gpg --batch --pinentry-mode=loopback --passphrase "${{ secrets.GPG_KEY_PASSPHRASE }}" $@' >> /tmp/gpg.sh
