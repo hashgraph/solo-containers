@@ -82,79 +82,78 @@ jobs:
           [[ "${{ github.event.inputs.dry-run-enabled }}" == true && ! -f VERSION ]] && echo -n "0.0.0-latest" > VERSION
           echo "version=$(cat VERSION | tr -d '[:space:]')" >> ${GITHUB_OUTPUT}
 
-#  publish-docker-image:
-#    name: Publish / Docker Image
-#    runs-on: solo-linux-medium
-#    needs:
-#      - prepare-release
-#    steps:
-#      - name: Harden the runner (Audit all outbound calls)
-#        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
-#        with:
-#          egress-policy: audit
-#
-#      - name: Verify Version Variable is Populated
-#        run: |
-#          echo "version: ${{ needs.prepare-release.outputs.version }}"
-#          if [[ "${{ needs.prepare-release.outputs.version }}" == "" ]]; then
-#            echo "ERROR: version missing"
-#            exit 1
-#          fi
-#
-#      - name: Checkout repository
-#        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-#
-#      - name: Login to GitHub Container Registry
-#        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
-#        with:
-#          registry: ${{ env.REGISTRY }}
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Set up Docker Qemu
-#        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
-#
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
-#
-#      - name: Build Docker Image (ubi8-init-dind)
-#        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-#        with:
-#          context: docker/ubi8-init-dind
-#          platforms: linux/amd64, linux/arm64
-#          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
-#          tags: ghcr.io/${{ github.repository }}/ubi8-init-dind:${{ needs.prepare-release.outputs.version }}
-#
-#      - name: Build Docker Image (ubi8-init-java21)
-#        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-#        with:
-#          context: docker/ubi8-init-java21
-#          platforms: linux/amd64, linux/arm64
-#          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
-#          tags: ghcr.io/${{ github.repository }}/ubi8-init-java21:${{ needs.prepare-release.outputs.version }}
-#
-#      - name: Build Docker Image (kubectl-bats)
-#        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-#        with:
-#          context: docker/kubectl-bats
-#          platforms: linux/amd64, linux/arm64
-#          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
-#          tags: ghcr.io/${{ github.repository }}/kubectl-bats:${{ needs.prepare-release.outputs.version }}
-#
-#      - name: Build Docker Image (backup-uploader)
-#        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-#        with:
-#          context: docker/backup-uploader
-#          platforms: linux/amd64, linux/arm64
-#          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
-#          tags: ghcr.io/${{ github.repository }}/backup-uploader:${{ needs.prepare-release.outputs.version }}
+  publish-docker-image:
+    name: Publish / Docker Image
+    runs-on: solo-linux-medium
+    needs:
+      - prepare-release
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          egress-policy: audit
+
+      - name: Verify Version Variable is Populated
+        run: |
+          echo "version: ${{ needs.prepare-release.outputs.version }}"
+          if [[ "${{ needs.prepare-release.outputs.version }}" == "" ]]; then
+            echo "ERROR: version missing"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Qemu
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+
+      - name: Build Docker Image (ubi8-init-dind)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: docker/ubi8-init-dind
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/ubi8-init-dind:${{ needs.prepare-release.outputs.version }}
+
+      - name: Build Docker Image (ubi8-init-java21)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: docker/ubi8-init-java21
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/ubi8-init-java21:${{ needs.prepare-release.outputs.version }}
+
+      - name: Build Docker Image (kubectl-bats)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: docker/kubectl-bats
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/kubectl-bats:${{ needs.prepare-release.outputs.version }}
+
+      - name: Build Docker Image (backup-uploader)
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: docker/backup-uploader
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/backup-uploader:${{ needs.prepare-release.outputs.version }}
 
   create-github-release:
     name: Github / Release
     runs-on: solo-linux-medium
     needs:
-      - prepare-release
-#      - publish-docker-image
+      - publish-docker-image
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
