@@ -59,11 +59,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install Semantic Release
         run: |
-          npm install -g semantic-release@23.0.0 @semantic-release/git@10.0.1 @semantic-release/exec@6.0.3
+          npm install -g semantic-release@23.1.1 @semantic-release/git@10.0.1 @semantic-release/exec@6.0.3
           npm install -g conventional-changelog-conventionalcommits@7.0.2 @commitlint/cli@18.6.0 @commitlint/config-conventional@18.6.0
           npm install -g marked-mangle@1.1.6 marked-gfm-heading-id@3.1.2 semantic-release-conventional-commits@3.0.0
 
@@ -192,11 +192,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install Semantic Release
         run: |
-          npm install -g semantic-release@23.0.0 @semantic-release/git@10.0.1 @semantic-release/exec@6.0.3
+          npm install -g semantic-release@23.1.1 @semantic-release/git@10.0.1 @semantic-release/exec@6.0.3
           npm install -g conventional-changelog-conventionalcommits@7.0.2 @commitlint/cli@18.6.0 @commitlint/config-conventional@18.6.0
           npm install -g marked-mangle@1.1.6 marked-gfm-heading-id@3.1.2 semantic-release-conventional-commits@3.0.0
 
@@ -209,4 +209,4 @@ jobs:
           GIT_COMMITTER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
           GIT_EDITOR: "true"  # Set to a non-interactive value to prevent errors
         if: ${{ github.event.inputs.dry-run-enabled != 'true' && !cancelled() && !failure() }}
-        run: npx semantic-release --no-sign
+        run: npx semantic-release
