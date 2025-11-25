@@ -165,6 +165,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Semantic Release Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y vim-tiny
+
       - name: Install GnuPG Tools
         run: |
           if ! command -v gpg2 >/dev/null 2>&1; then
