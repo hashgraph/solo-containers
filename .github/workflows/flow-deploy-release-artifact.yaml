@@ -93,6 +93,14 @@ jobs:
         with:
           egress-policy: audit
 
+      - name: Verify Version Variable is Populated
+        run: |
+          echo "version: ${{ needs.prepare-release.outputs.version }}"
+          if [[ "${{ needs.prepare-release.outputs.version }}" == "" ]]; then
+            echo "ERROR: version missing"
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
