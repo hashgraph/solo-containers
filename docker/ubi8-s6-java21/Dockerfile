@@ -91,8 +91,29 @@ RUN set -eux; \
     	      --directory "/usr/local/java" \
     	      --strip-components 1 \
     	      --no-same-owner \
-    	  ; \
+   	  ; \
     rm -f /tmp/openjdk.tar.gz /usr/local/java/lib/src.zip;
+
+# Install s6-overlay with checksum verification
+RUN set -eux; \
+    ARCH="$(objdump="$(command -v objdump)" && objdump --file-headers "$objdump" | awk -F '[:,]+[[:space:]]+' '$1 == "architecture" { print $2 }')"; \
+    case "${ARCH}" in \
+        aarch64|arm64) S6_ARCH="aarch64";; \
+        amd64|i386:x86-64) S6_ARCH="x86_64";; \
+        ppc64el|powerpc:common64) S6_ARCH="ppc64le";; \
+        *) echo "Unsupported s6-overlay architecture: ${ARCH}"; exit 1;; \
+    esac; \
+    NOARCH_URL="https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz"; \
+    ARCH_URL="https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz"; \
+    curl -LfsSo /tmp/s6-overlay-noarch.tar.xz "${NOARCH_URL}"; \
+    curl -LfsSo /tmp/s6-overlay-noarch.tar.xz.sha256 "${NOARCH_URL}.sha256"; \
+    curl -LfsSo /tmp/s6-overlay-${S6_ARCH}.tar.xz "${ARCH_URL}"; \
+    curl -LfsSo /tmp/s6-overlay-${S6_ARCH}.tar.xz.sha256 "${ARCH_URL}.sha256"; \
+    (cd /tmp && sha256sum -c s6-overlay-noarch.tar.xz.sha256); \
+    (cd /tmp && sha256sum -c s6-overlay-${S6_ARCH}.tar.xz.sha256); \
+    tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz; \
+    tar -C / -Jxpf /tmp/s6-overlay-${S6_ARCH}.tar.xz; \
+    rm -f /tmp/s6-overlay-noarch.tar.xz /tmp/s6-overlay-noarch.tar.xz.sha256 /tmp/s6-overlay-${S6_ARCH}.tar.xz /tmp/s6-overlay-${S6_ARCH}.tar.xz.sha256
 
 RUN echo >> /etc/sudoers && \
     echo "%hedera ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -148,6 +169,10 @@ RUN chmod -R +x /etc/cont-init.d /etc/services.d
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
+
+# Basic service health check via s6
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD /command/s6-svstat /run/service/network-node | grep -q "up" || exit 1
 
 # Set Final Working Directory and User
 WORKDIR "/opt/hgcapp"

@@ -2,6 +2,13 @@
 set -euo pipefail
 
 exit_code="${1:-0}"
+signal="${2:-0}"
+
+echo "network-node finished with exit code ${exit_code}, signal ${signal}"
+if [ "${exit_code}" -ne 0 ]; then
+  echo "network-node exited abnormally"
+fi
+
 if [ "${exit_code}" -eq 0 ]; then
   if command -v s6-svc >/dev/null 2>&1; then
     s6-svc -d /run/service/network-node 2>/dev/null || true
