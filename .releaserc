@@ -24,6 +24,9 @@
   ],
   "branches": [
     {
+      "name": "s6-support"
+    },
+    {
       "name": "main"
     },
     {
