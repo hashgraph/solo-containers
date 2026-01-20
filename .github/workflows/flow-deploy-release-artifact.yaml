@@ -79,6 +79,14 @@ jobs:
       - name: Extract Version
         id: tag
         run: |
+          if [[ ! -f VERSION ]]; then
+            # Semantic release didn't create VERSION (branch not configured)
+            # Generate a test version from branch name and short SHA
+            BRANCH_NAME="${{ github.ref_name }}"
+            SHORT_SHA=$(git rev-parse --short HEAD)
+            SANITIZED_BRANCH=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
+            echo -n "0.0.0-${SANITIZED_BRANCH}-${SHORT_SHA}" > VERSION
+          fi
           [[ "${{ github.event.inputs.dry-run-enabled }}" == true && ! -f VERSION ]] && echo -n "0.0.0-latest" > VERSION
           echo "version=$(cat VERSION | tr -d '[:space:]')" >> ${GITHUB_OUTPUT}
 
