@@ -1,3 +1,14 @@
 #!/command/with-contenv bash
 set -euo pipefail
+
+INITIAL_START="$(s6-svstat -o wantedup .)"
+if command -v s6-svc >/dev/null 2>&1; then
+  s6-svc -O .
+fi
+
+AUTO_START_CONSENSUS_SERVICE="${AUTO_START_CONSENSUS_SERVICE:-false}"
+if [ "${AUTO_START_CONSENSUS_SERVICE}" != "true" ] && [ "${INITIAL_START}" = "true" ]; then
+  exit 0
+fi
+
 exec s6-setuidgid hedera /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh
