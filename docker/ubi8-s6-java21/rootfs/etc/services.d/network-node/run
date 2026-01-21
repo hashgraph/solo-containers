@@ -1,13 +1,9 @@
 #!/command/with-contenv bash
 set -euo pipefail
 
-INITIAL_START="$(s6-svstat -o wantedup .)"
-if command -v s6-svc >/dev/null 2>&1; then
-  s6-svc -O .
-fi
-
-AUTO_START_CONSENSUS_SERVICE="${AUTO_START_CONSENSUS_SERVICE:-false}"
-if [ "${AUTO_START_CONSENSUS_SERVICE}" != "true" ] && [ "${INITIAL_START}" = "true" ]; then
+# If AUTO_START_CONSENSUS_SERVICE is explicitly set to false, do not start the node.
+# Default is true so the service starts normally unless overridden via env.
+if [ "${AUTO_START_CONSENSUS_SERVICE:-true}" == false ]; then
   exit 0
 fi
 
