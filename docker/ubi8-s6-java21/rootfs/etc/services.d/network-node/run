@@ -1,10 +1,4 @@
 #!/command/with-contenv bash
 set -euo pipefail
 
-# If AUTO_START_CONSENSUS_SERVICE is explicitly set to false, do not start the node.
-# Default is true so the service starts normally unless overridden via env.
-if [ "${AUTO_START_CONSENSUS_SERVICE:-true}" == false ]; then
-  exit 0
-fi
-
 exec s6-setuidgid hedera /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh
