@@ -150,17 +150,15 @@ RUN chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh && \
     chown -R 2000:2000 /opt/hgcapp/
 
 RUN mkdir -p /etc/network-node && \
-    touch /etc/network-node/application.env && \
-    chown -R 2000:2000 /etc/network-node
-
-RUN mkdir -p /etc/network-node/startup && \
-    chown -R 2000:2000 /etc/network-node/startup && \
+    mkdir -p /etc/network-node/startup && \
     mkdir -p /etc/network-node/config && \
-    chown -R 2000:2000 /etc/network-node/config
+    touch /etc/network-node/env/application.env
+
 ADD stage_files.sh /etc/network-node/startup/
 
-RUN chmod -R +x /etc/network-node/startup/stage_files.sh
-
+RUN chown -R 2000:2000 /etc/network-node && \
+    chmod -R +x /etc/network-node/startup/stage_files.sh && \
+    chmod -R +x /etc/network-node/env/application.env
 
 # Copy s6 overlay rootfs additions
 COPY rootfs/ /
