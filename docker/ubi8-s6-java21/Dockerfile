@@ -149,7 +149,7 @@ ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
 RUN chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh && \
     chown -R 2000:2000 /opt/hgcapp/
 
-RUN mkdir -p /etc/network-node && \
+RUN mkdir -p /etc/network-node/env && \
     mkdir -p /etc/network-node/startup && \
     mkdir -p /etc/network-node/config && \
     touch /etc/network-node/env/application.env
