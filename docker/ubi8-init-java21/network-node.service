@@ -8,7 +8,7 @@ Restart=on-failure
 User=hedera
 Group=hedera
 
-PassEnvironment=JAVA_HOME JAVA_OPTS JAVA_HEAP_MIN JAVA_HEAP_MAX JAVA_MAIN_CLASS JAVA_CLASS_PATH PATH APP_HOME CONSENSUS_NODE_ID
+PassEnvironment=JAVA_HOME JAVA_OPTS JAVA_HEAP_MIN JAVA_HEAP_MAX JAVA_MAIN_CLASS JAVA_CLASS_PATH PATH APP_HOME CONSENSUS_NODE_ID TSS_LIB_WRAPS_ARTIFACTS_PATH
 EnvironmentFile=/etc/network-node/env/application.env
 
 WorkingDirectory=/opt/hgcapp/services-hedera/HapiApp2.0
