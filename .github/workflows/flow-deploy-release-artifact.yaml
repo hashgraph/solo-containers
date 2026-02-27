@@ -149,6 +149,14 @@ jobs:
           push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
           tags: ghcr.io/${{ github.repository }}/ubi8-init-java25:${{ needs.prepare-release.outputs.version }}
 
+      - name: Build Docker Image (ubi8-s6-java25)
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: docker/ubi8-s6-java25
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/ubi8-s6-java25:${{ needs.prepare-release.outputs.version }}
+
       - name: Build Docker Image (kubectl-bats)
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:

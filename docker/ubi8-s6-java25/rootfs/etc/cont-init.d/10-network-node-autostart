@@ -1,0 +1,9 @@
+#!/command/with-contenv bash
+set -euo pipefail
+
+FLAG="/opt/hgcapp/services-hedera/HapiApp2.0/state/network-node.enabled"
+
+if [ -f "$FLAG" ]; then
+  # If the flag is present, bring the service up; ignore errors if s6 isn't ready yet
+  /command/s6-svc -u /run/service/network-node || true
+fi
