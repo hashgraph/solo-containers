@@ -125,14 +125,6 @@ jobs:
           push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
           tags: ghcr.io/${{ github.repository }}/ubi8-init-dind:${{ needs.prepare-release.outputs.version }}
 
-      - name: Build Docker Image (ubi8-init-java21)
-        uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
-        with:
-          context: docker/ubi8-init-java21
-          platforms: linux/amd64, linux/arm64
-          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
-          tags: ghcr.io/${{ github.repository }}/ubi8-init-java21:${{ needs.prepare-release.outputs.version }}
-
       - name: Build Docker Image (ubi8-s6-java21)
         uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
         with:
