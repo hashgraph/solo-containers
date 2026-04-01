@@ -169,7 +169,8 @@ RUN chmod -R +x /etc/cont-init.d \
     && chmod +x /etc/s6-overlay/s6-rc.d/network-node-autostart/up \
     && chmod +x /etc/s6-overlay/s6-rc.d/network-node/run \
     && chmod +x /etc/s6-overlay/s6-rc.d/network-node/finish \
-    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-log/run
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-log/run \
+    && chmod +x /etc/s6-overlay/scripts/network-node-autostart
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
