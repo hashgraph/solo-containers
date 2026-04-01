@@ -140,7 +140,9 @@ RUN mkdir -p "/opt/hgcapp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/saved" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/tmp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade" && \
-    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output"
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output" && \
+    mkdir -p "/var/log/network-node" && \
+    chown 2000:2000 "/var/log/network-node"
 
 # Add the entrypoint script and systemd service file
 ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
@@ -164,9 +166,10 @@ RUN chown -R 2000:2000 /etc/network-node && \
 COPY rootfs/ /
 
 RUN chmod -R +x /etc/cont-init.d \
-    && chmod -R +x /etc/s6-overlay/s6-rc.d/network-node-autostart/up \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-autostart/up \
     && chmod +x /etc/s6-overlay/s6-rc.d/network-node/run \
-    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/finish
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/finish \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-log/run
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
