@@ -1,0 +1,7 @@
+#!/command/with-contenv bash
+set -euo pipefail
+
+FLAG="/opt/hgcapp/services-hedera/HapiApp2.0/state/network-node.enabled"
+if [ -f "${FLAG}" ]; then
+  exec /command/s6-rc -u change network-node
+fi
