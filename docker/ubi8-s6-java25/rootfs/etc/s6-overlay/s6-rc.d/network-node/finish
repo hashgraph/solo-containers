@@ -9,9 +9,12 @@ if [ "${exit_code}" -ne 0 ]; then
   echo "network-node exited abnormally"
 fi
 
-# On a clean exit, mark the service down so s6-rc does not auto-restart it.
+# On a clean exit, set the "once" flag so s6-supervise does not restart
+# the service. Using s6-svc -O is safe to call from inside finish because
+# it only flips a flag in the supervision tree and avoids racing with
+# s6-rc's own state machine (which s6-rc -d change would do).
 if [ "${exit_code}" -eq 0 ]; then
-  /command/s6-rc -d change network-node || true
+  /command/s6-svc -O /run/service/network-node 2>/dev/null || true
 fi
 
 exit 0
