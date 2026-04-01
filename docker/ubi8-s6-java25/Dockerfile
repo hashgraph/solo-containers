@@ -163,7 +163,10 @@ RUN chown -R 2000:2000 /etc/network-node && \
 # Copy s6 overlay rootfs additions
 COPY rootfs/ /
 
-RUN chmod -R +x /etc/cont-init.d /etc/services.d
+RUN chmod -R +x /etc/cont-init.d \
+    && chmod -R +x /etc/s6-overlay/s6-rc.d/network-node-autostart/up \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/run \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/finish
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
