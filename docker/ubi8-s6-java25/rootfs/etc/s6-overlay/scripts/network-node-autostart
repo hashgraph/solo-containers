@@ -3,5 +3,24 @@ set -euo pipefail
 
 FLAG="/opt/hgcapp/services-hedera/HapiApp2.0/state/network-node.enabled"
 if [ -f "${FLAG}" ]; then
-  exec /command/s6-rc -u change network-node
+  # This script runs inside the s6 boot transaction (oneshot service startup).
+  # Calling `s6-rc` synchronously here can fail with:
+  #   "s6-rc: fatal: unable to take locks: Resource busy"
+  # because the current transaction lock is still held.
+  #
+  # Queue the startup in a background retry loop and return success immediately,
+  # so container boot is not aborted while the lock is transiently unavailable.
+  (
+    max_attempts=30
+    for attempt in $(seq 1 "${max_attempts}"); do
+      if /command/s6-rc -u change network-node >/dev/null 2>&1; then
+        echo "network-node-autostart: started network-node on attempt ${attempt}" >&2
+        exit 0
+      fi
+      sleep 1
+    done
+    echo "network-node-autostart: unable to start network-node after ${max_attempts} attempts" >&2
+  ) &
 fi
+
+exit 0
