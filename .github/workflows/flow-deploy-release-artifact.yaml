@@ -114,6 +114,33 @@ jobs:
       - name: Set up Docker Qemu
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
+      - name: Preload BuildKit Image (retry)
+        run: |
+          set -euo pipefail
+
+          TARGET_IMAGE="moby/buildkit:buildx-stable-1"
+          CANDIDATES=(
+            "registry-1.docker.io/moby/buildkit:buildx-stable-1"
+            "docker.io/moby/buildkit:buildx-stable-1"
+            "moby/buildkit:buildx-stable-1"
+          )
+
+          for candidate in "${CANDIDATES[@]}"; do
+            for attempt in 1 2 3; do
+              echo "Pull attempt ${attempt}/3 for ${candidate}"
+              if docker pull "${candidate}"; then
+                docker tag "${candidate}" "${TARGET_IMAGE}"
+                docker image inspect "${TARGET_IMAGE}" >/dev/null
+                echo "Preloaded ${TARGET_IMAGE} via ${candidate}"
+                exit 0
+              fi
+              sleep $((attempt * 5))
+            done
+          done
+
+          echo "Failed to preload ${TARGET_IMAGE} after retries"
+          exit 1
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
