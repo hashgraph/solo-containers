@@ -38,8 +38,8 @@
     },
     {
       "name": "ci/*",
-      "prerelease": "ci",
-      "channel": "ci"
+      "prerelease": "alpha",
+      "channel": "alpha"
     },
     {
       "name": "beta/*",
