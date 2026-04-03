@@ -47,6 +47,44 @@ wait_for_jvm_down() {
   return 1
 }
 
+get_services_main_pids() {
+  # Use ps + awk (instead of pgrep -f) so command-line text from helper scripts
+  # cannot be misidentified as the ServicesMain JVM process.
+  ps -eo pid,args | awk "/${MAIN_CLASS_PATTERN}/{print \$1}"
+}
+
+force_stop_services_main() {
+  log "entering emergency ServicesMain shutdown path"
+
+  # Mark supervisor down first so any forced JVM kill is not immediately
+  # restarted by s6 while shutdown is in progress.
+  /command/s6-svc -d "${SERVICE_DIR}" >/dev/null 2>&1 || true
+
+  local pids
+  pids="$(get_services_main_pids)"
+  if [ -n "${pids}" ]; then
+    log "sending TERM to ServicesMain (pids: ${pids})"
+    kill -TERM ${pids} || true
+  fi
+
+  if wait_for_jvm_down; then
+    return 0
+  fi
+
+  pids="$(get_services_main_pids)"
+  if [ -n "${pids}" ]; then
+    log "sending KILL to ServicesMain (pids: ${pids})"
+    kill -KILL ${pids} || true
+  fi
+
+  if wait_for_jvm_down; then
+    return 0
+  fi
+
+  log "failed to stop ServicesMain after emergency shutdown"
+  return 1
+}
+
 change_with_retries() {
   local mode="$1"
   for _attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
@@ -71,8 +109,15 @@ start_service() {
 
 stop_service() {
   wait_for_supervisor
-  change_with_retries d
-  wait_for_jvm_down
+  if ! change_with_retries d; then
+    log "s6-rc stop transition failed; attempting emergency ServicesMain shutdown"
+  fi
+
+  if wait_for_jvm_down; then
+    return 0
+  fi
+
+  force_stop_services_main
 }
 
 usage() {
