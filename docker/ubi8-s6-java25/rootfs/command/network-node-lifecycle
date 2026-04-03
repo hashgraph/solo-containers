@@ -1,0 +1,104 @@
+#!/bin/bash
+set -euo pipefail
+
+SERVICE_NAME="network-node"
+SERVICE_DIR="/run/service/${SERVICE_NAME}"
+MAX_ATTEMPTS="${NETWORK_NODE_LIFECYCLE_MAX_ATTEMPTS:-30}"
+SLEEP_SECONDS="${NETWORK_NODE_LIFECYCLE_SLEEP_SECONDS:-1}"
+MAIN_CLASS_PATTERN='[c]om.hedera.node.app.ServicesMain'
+
+log() {
+  echo "network-node-lifecycle: $*" >&2
+}
+
+wait_for_supervisor() {
+  for _attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+    if [ -d "${SERVICE_DIR}" ] && /command/s6-svok "${SERVICE_DIR}" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep "${SLEEP_SECONDS}"
+  done
+
+  log "supervisor not ready for ${SERVICE_DIR}"
+  return 1
+}
+
+wait_for_jvm_up() {
+  for _attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+    if ps -ef | grep -q "${MAIN_CLASS_PATTERN}"; then
+      return 0
+    fi
+    sleep "${SLEEP_SECONDS}"
+  done
+
+  log "timed out waiting for ServicesMain JVM to start"
+  return 1
+}
+
+wait_for_jvm_down() {
+  for _attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+    if ! ps -ef | grep -q "${MAIN_CLASS_PATTERN}"; then
+      return 0
+    fi
+    sleep "${SLEEP_SECONDS}"
+  done
+
+  log "timed out waiting for ServicesMain JVM to stop"
+  return 1
+}
+
+change_with_retries() {
+  local mode="$1"
+  for _attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+    if /command/s6-rc "-${mode}" change "${SERVICE_NAME}" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep "${SLEEP_SECONDS}"
+  done
+
+  log "failed to run 's6-rc -${mode} change ${SERVICE_NAME}' after ${MAX_ATTEMPTS} attempts"
+  return 1
+}
+
+start_service() {
+  wait_for_supervisor
+  # Always force a full down -> up cycle. This clears stale supervisor state
+  # (such as "once" from the finish script) before starting the JVM.
+  change_with_retries d
+  change_with_retries u
+  wait_for_jvm_up
+}
+
+stop_service() {
+  wait_for_supervisor
+  change_with_retries d
+  wait_for_jvm_down
+}
+
+usage() {
+  log "usage: $0 <start|stop|restart|status>"
+}
+
+action="${1:-}"
+case "${action}" in
+  start)
+    start_service
+    ;;
+  stop)
+    stop_service
+    ;;
+  restart)
+    stop_service
+    start_service
+    ;;
+  status)
+    shift
+    exec /etc/s6-overlay/scripts/network-node-status "$@"
+    ;;
+  *)
+    usage
+    exit 64
+    ;;
+esac
+
+exit 0
