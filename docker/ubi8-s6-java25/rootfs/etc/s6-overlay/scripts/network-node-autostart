@@ -1,0 +1,27 @@
+#!/command/with-contenv bash
+set -euo pipefail
+
+FLAG="/opt/hgcapp/services-hedera/HapiApp2.0/state/network-node.enabled"
+if [ -f "${FLAG}" ]; then
+  # Use s6-svc rather than s6-rc to avoid nested lock contention.
+  # s6-rc holds its transaction lock during boot; calling s6-rc again from
+  # within this oneshot can fail with:
+  #   "s6-rc: fatal: unable to take locks: Resource busy"
+  #
+  # s6-svc talks directly to the service supervisor and bypasses the s6-rc lock.
+  # Wait briefly for the supervisor directory to become available, then request
+  # an "up" transition for network-node.
+  SERVICE_DIR="/run/service/network-node"
+  MAX_ATTEMPTS=30
+  for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+    if [ -d "${SERVICE_DIR}" ] && /command/s6-svok "${SERVICE_DIR}" >/dev/null 2>&1; then
+      if /command/s6-svc -u "${SERVICE_DIR}" >/dev/null 2>&1; then
+        echo "network-node-autostart: started network-node on attempt ${attempt}" >&2
+        break
+      fi
+    fi
+    sleep 1
+  done
+fi
+
+exit 0

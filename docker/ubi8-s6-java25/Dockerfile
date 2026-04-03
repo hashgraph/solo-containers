@@ -140,7 +140,9 @@ RUN mkdir -p "/opt/hgcapp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/saved" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/tmp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade" && \
-    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output"
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output" && \
+    mkdir -p "/var/log/network-node" && \
+    chown 2000:2000 "/var/log/network-node"
 
 # Add the entrypoint script and systemd service file
 ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
@@ -163,14 +165,23 @@ RUN chown -R 2000:2000 /etc/network-node && \
 # Copy s6 overlay rootfs additions
 COPY rootfs/ /
 
-RUN chmod -R +x /etc/cont-init.d /etc/services.d
+RUN chmod -R +x /etc/cont-init.d \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-autostart/up \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/run \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/finish \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-log/run \
+    && chmod +x /etc/s6-overlay/scripts/network-node-autostart \
+    && chmod +x /etc/s6-overlay/scripts/network-node-status \
+    && chmod +x /command/network-node-lifecycle
 
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
 
-# Basic service health check via s6
+# Basic service health check via s6 supervisor state.
+# Keep this supervisor-only to preserve current behavior and avoid failing
+# health checks during JVM warm-up; the helper supports full runtime checks too.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD /command/s6-svstat /run/service/network-node | grep -q "up" || exit 1
+  CMD /etc/s6-overlay/scripts/network-node-status --supervisor-only --quiet || exit 1
 
 # Set Final Working Directory and User
 WORKDIR "/opt/hgcapp"
