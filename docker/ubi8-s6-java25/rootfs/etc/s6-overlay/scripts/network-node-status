@@ -1,0 +1,71 @@
+#!/command/with-contenv bash
+set -euo pipefail
+
+# Reports network-node runtime status using s6 supervision state and (optionally)
+# the Hedera JVM process presence.
+#
+# Exit codes:
+#   0 = service is up (and JVM is running unless --supervisor-only was provided)
+#   1 = network-node service directory does not exist
+#   2 = network-node is not supervised/alive
+#   3 = network-node supervisor exists but service is not "up"
+#   4 = supervisor is up but Hedera ServicesMain JVM is not running
+
+SERVICE_DIR="/run/service/network-node"
+CHECK_RUNTIME=true
+QUIET=false
+
+for arg in "$@"; do
+  case "${arg}" in
+    --supervisor-only)
+      CHECK_RUNTIME=false
+      ;;
+    --quiet)
+      QUIET=true
+      ;;
+    *)
+      if [ "${QUIET}" = false ]; then
+        echo "network-node-status: unknown argument '${arg}'" >&2
+      fi
+      exit 64
+      ;;
+  esac
+done
+
+if [ ! -d "${SERVICE_DIR}" ]; then
+  if [ "${QUIET}" = false ]; then
+    echo "network-node-status: missing service directory ${SERVICE_DIR}" >&2
+  fi
+  exit 1
+fi
+
+if ! /command/s6-svok "${SERVICE_DIR}" >/dev/null 2>&1; then
+  if [ "${QUIET}" = false ]; then
+    echo "network-node-status: supervisor not available for ${SERVICE_DIR}" >&2
+  fi
+  exit 2
+fi
+
+if ! /command/s6-svstat "${SERVICE_DIR}" 2>/dev/null | grep -q 'up'; then
+  if [ "${QUIET}" = false ]; then
+    echo "network-node-status: supervisor present but service is not up" >&2
+  fi
+  exit 3
+fi
+
+if [ "${CHECK_RUNTIME}" = true ] && ! ps -ef | grep -q '[c]om.hedera.node.app.ServicesMain'; then
+  if [ "${QUIET}" = false ]; then
+    echo "network-node-status: supervisor is up but ServicesMain is not running" >&2
+  fi
+  exit 4
+fi
+
+if [ "${QUIET}" = false ]; then
+  if [ "${CHECK_RUNTIME}" = true ]; then
+    echo "network-node-status: up (supervisor + ServicesMain)"
+  else
+    echo "network-node-status: up (supervisor)"
+  fi
+fi
+
+exit 0
