@@ -45,6 +45,7 @@ jobs:
     runs-on: solo-linux-medium
     outputs:
       version: ${{ steps.tag.outputs.version }}
+      should-release: ${{ steps.tag.outputs.should-release }}
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
@@ -79,14 +80,32 @@ jobs:
       - name: Extract Version
         id: tag
         run: |
-          [[ "${{ github.event.inputs.dry-run-enabled }}" == true && ! -f VERSION ]] && echo -n "0.0.0-latest" > VERSION
-          echo "version=$(cat VERSION | tr -d '[:space:]')" >> ${GITHUB_OUTPUT}
+          if [[ "${{ github.event.inputs.dry-run-enabled }}" == true && ! -f VERSION ]]; then
+            echo -n "0.0.0-latest" > VERSION
+          fi
+
+          if [[ -f VERSION ]]; then
+            version="$(tr -d '[:space:]' < VERSION)"
+          else
+            version=""
+          fi
+
+          if [[ -n "${version}" ]]; then
+            echo "version=${version}" >> "${GITHUB_OUTPUT}"
+            echo "should-release=true" >> "${GITHUB_OUTPUT}"
+            echo "Semantic release version resolved: ${version}"
+          else
+            echo "version=" >> "${GITHUB_OUTPUT}"
+            echo "should-release=false" >> "${GITHUB_OUTPUT}"
+            echo "No release version produced (likely no releasable commits). Skipping publish jobs."
+          fi
 
   publish-docker-image:
     name: Publish / Docker Image
     runs-on: solo-linux-medium
     needs:
       - prepare-release
+    if: ${{ needs.prepare-release.outputs.should-release == 'true' }}
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
@@ -169,7 +188,9 @@ jobs:
     name: Github / Release
     runs-on: solo-linux-medium
     needs:
+      - prepare-release
       - publish-docker-image
+    if: ${{ needs.prepare-release.outputs.should-release == 'true' }}
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
