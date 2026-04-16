@@ -3,6 +3,8 @@ set -euo pipefail
 
 SERVICE_NAME="network-node"
 SERVICE_DIR="/run/service/${SERVICE_NAME}"
+HEDERA_HAPI_PATH="${HEDERA_HAPI_PATH:-/opt/hgcapp/services-hedera/HapiApp2.0}"
+AUTOSTART_FLAG_PATH="${HEDERA_HAPI_PATH}/state/network-node.enabled"
 MAX_ATTEMPTS="${NETWORK_NODE_LIFECYCLE_MAX_ATTEMPTS:-30}"
 SLEEP_SECONDS="${NETWORK_NODE_LIFECYCLE_SLEEP_SECONDS:-1}"
 MAIN_CLASS_PATTERN='[c]om.hedera.node.app.ServicesMain'
@@ -120,8 +122,17 @@ stop_service() {
   force_stop_services_main
 }
 
+enable_autostart() {
+  mkdir -p "$(dirname "${AUTOSTART_FLAG_PATH}")"
+  touch "${AUTOSTART_FLAG_PATH}"
+}
+
+disable_autostart() {
+  rm -f "${AUTOSTART_FLAG_PATH}"
+}
+
 usage() {
-  log "usage: $0 <start|stop|restart|status>"
+  log "usage: $0 <start|stop|restart|status|enable-autostart|disable-autostart|start-and-enable-autostart|stop-and-disable-autostart>"
 }
 
 action="${1:-}"
@@ -139,6 +150,20 @@ case "${action}" in
   status)
     shift
     exec /etc/s6-overlay/scripts/network-node-status "$@"
+    ;;
+  enable-autostart)
+    enable_autostart
+    ;;
+  disable-autostart)
+    disable_autostart
+    ;;
+  start-and-enable-autostart)
+    enable_autostart
+    start_service
+    ;;
+  stop-and-disable-autostart)
+    disable_autostart
+    stop_service
     ;;
   *)
     usage
