@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-FROM registry.access.redhat.com/ubi8/ubi-init:latest
+FROM registry.access.redhat.com/ubi8/ubi-init:8.10
 # Define Standard Environment Variables
 ENV LC_ALL=C.UTF-8
 

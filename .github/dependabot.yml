@@ -5,3 +5,15 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 15
+  - package-ecosystem: "docker"
+    directories:
+      - "docker/backup-uploader"
+      - "docker/kubectl-bats"
+      - "docker/ubi8-init-dind"
+      - "docker/ubi8-init-java21"
+      - "docker/ubi8-init-java25"
+      - "docker/ubi8-s6-java21"
+      - "docker/ubi8-s6-java25"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 15
