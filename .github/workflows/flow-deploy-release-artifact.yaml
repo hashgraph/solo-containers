@@ -118,7 +118,7 @@ jobs:
         uses: step-security/setup-buildx-action@f931205d68723ad9589fd2a7e2ece238bf9de341 # v4.0.0
 
       - name: Build Docker Image (ubi8-init-dind)
-        uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
         with:
           context: docker/ubi8-init-dind
           platforms: linux/amd64, linux/arm64
@@ -126,7 +126,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/ubi8-init-dind:${{ needs.prepare-release.outputs.version }}
 
       - name: Build Docker Image (ubi8-s6-java21)
-        uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
         with:
           context: docker/ubi8-s6-java21
           platforms: linux/amd64, linux/arm64
@@ -134,7 +134,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/ubi8-s6-java21:${{ needs.prepare-release.outputs.version }}
 
       - name: Build Docker Image (ubi8-init-java25)
-        uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
         with:
           context: docker/ubi8-init-java25
           platforms: linux/amd64, linux/arm64
@@ -142,7 +142,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/ubi8-init-java25:${{ needs.prepare-release.outputs.version }}
 
       - name: Build Docker Image (ubi8-s6-java25)
-        uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
         with:
           context: docker/ubi8-s6-java25
           platforms: linux/amd64, linux/arm64
@@ -150,7 +150,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/ubi8-s6-java25:${{ needs.prepare-release.outputs.version }}
 
       - name: Build Docker Image (kubectl-bats)
-        uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
         with:
           context: docker/kubectl-bats
           platforms: linux/amd64, linux/arm64
@@ -158,7 +158,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/kubectl-bats:${{ needs.prepare-release.outputs.version }}
 
       - name: Build Docker Image (backup-uploader)
-        uses: step-security/docker-build-push-action@a8c3d08b23f8be6aeed43eb1a14ce6fe51284438 # v6.18.0
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
         with:
           context: docker/backup-uploader
           platforms: linux/amd64, linux/arm64
