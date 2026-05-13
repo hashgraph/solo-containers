@@ -1,4 +1,4 @@
-FROM rclone/rclone:1.69.1 as rclone
+FROM rclone/rclone:1.74.1 as rclone
 
 FROM ubuntu:noble-20250127
 
