@@ -184,6 +184,22 @@ jobs:
           push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
           tags: ghcr.io/${{ github.repository }}/backup-uploader:${{ needs.prepare-release.outputs.version }}
 
+      - name: Build Docker Image (noble-init-java25)
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
+        with:
+          context: docker/noble-init-java25
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/noble-init-java25:${{ needs.prepare-release.outputs.version }}
+
+      - name: Build Docker Image (noble-s6-java25)
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
+        with:
+          context: docker/noble-s6-java25
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/noble-s6-java25:${{ needs.prepare-release.outputs.version }}
+
   create-github-release:
     name: Github / Release
     runs-on: solo-linux-medium
