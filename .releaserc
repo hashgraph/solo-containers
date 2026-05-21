@@ -33,12 +33,12 @@
     },
     {
       "name": "alpha/*",
-      "prerelease": "alpha",
+      "prerelease": true,
       "channel": "alpha"
     },
     {
       "name": "ci/*",
-      "prerelease": "alpha",
+      "prerelease": true,
       "channel": "alpha"
     },
     {
