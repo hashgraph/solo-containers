@@ -9,7 +9,7 @@ updates:
     directories:
       - "docker/backup-uploader"
       - "docker/kubectl-bats"
-      - "docker/trixie-s6-java25"
+      - "docker/debian-s6-java25"
       - "docker/ubi8-s6-java21"
       - "docker/ubi8-s6-java25"
     schedule:
