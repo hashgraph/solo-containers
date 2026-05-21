@@ -33,12 +33,12 @@
     },
     {
       "name": "alpha/*",
-      "prerelease": "${name.replace(/^alpha\\//g, 'alpha-').replace(/[^0-9A-Za-z-]/g, '-')}",
+      "prerelease": "alpha",
       "channel": "alpha"
     },
     {
       "name": "ci/*",
-      "prerelease": "${name.replace(/^ci\\//g, 'ci-').replace(/[^0-9A-Za-z-]/g, '-')}",
+      "prerelease": "alpha",
       "channel": "alpha"
     },
     {
