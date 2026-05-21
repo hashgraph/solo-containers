@@ -9,9 +9,7 @@ updates:
     directories:
       - "docker/backup-uploader"
       - "docker/kubectl-bats"
-      - "docker/ubi8-init-dind"
-      - "docker/ubi8-init-java21"
-      - "docker/ubi8-init-java25"
+      - "docker/trixie-s6-java25"
       - "docker/ubi8-s6-java21"
       - "docker/ubi8-s6-java25"
     schedule:
