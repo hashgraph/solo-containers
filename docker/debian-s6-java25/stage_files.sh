@@ -17,16 +17,19 @@
 ########################################################################################################################
 
 set -eo pipefail
-files=$(ls -1 /etc/network-node/config)
-for file in $files; do
-  if [ -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}" ]; then
-    rm -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
-  fi
-  ln -s "/etc/network-node/config/${file}" "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
-done
+
+if [ -d /etc/network-node/config ]; then
+  for file_path in /etc/network-node/config/*; do
+    [ -e "${file_path}" ] || break
+    file="$(basename "${file_path}")"
+    if [ -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}" ]; then
+      rm -f "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
+    fi
+    ln -s "/etc/network-node/config/${file}" "/opt/hgcapp/services-hedera/HapiApp2.0/${file}"
+  done
+fi
 
 # copy hedera.crt and hedera.key to /opt/hgcapp/services-hedera/HapiApp2.0/ if /shared-hapiapp exists and is not empty
 if [ -d "/shared-hapiapp" ] && [ "$(ls -A /shared-hapiapp)" ]; then
   cp /shared-hapiapp/* /opt/hgcapp/services-hedera/HapiApp2.0/
 fi
-

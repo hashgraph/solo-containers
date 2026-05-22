@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2023 Hedera Hashgraph, LLC
+# Copyright (C) 2026 Hedera Hashgraph, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
 # limitations under the License.
 #
 
-FROM registry.access.redhat.com/ubi8/ubi-init:8.10-15.1751402036@sha256:9606ab28f1d443c0a0f1e4737401d794711201febd43427267c27aac99bc1295
+FROM debian:trixie-20260518-slim@sha256:b6e2a152f22a40ff69d92cb397223c906017e1391a73c952b588e51af8883bf8
 # Define Standard Environment Variables
 ENV LC_ALL=C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Define JDK Environment Variables
-ENV JAVA_VERSION="jdk-21.0.7+6"
+ENV JAVA_VERSION="jdk-25+36"
 ENV JAVA_HOME=/usr/local/java
 ENV PATH=${JAVA_HOME}/bin:${PATH}
 
@@ -39,40 +40,43 @@ ENV MALLOC_ARENA_MAX=4
 
 # Log Folder Name Override
 ENV LOG_DIR_NAME=""
+ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 
-RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
-    /usr/bin/crb enable && \
-    dnf -y install \
+ARG S6_OVERLAY_VERSION=3.1.6.2
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         binutils \
-        libsodium \
+        libsodium23 \
         openssl \
-        zlib \
-        readline \
+        zlib1g \
+        libreadline8t64 \
         tzdata \
         gzip \
         tar \
+        xz-utils \
         ca-certificates \
         curl \
         zip \
         unzip \
         sudo && \
-    dnf clean all
+    rm -rf /var/lib/apt/lists/*
 
-# Install Java 21 Adoptium JDK
+# Install Java 25 Adoptium JDK
 RUN set -eux; \
-        ARCH="$(objdump="$(command -v objdump)" && objdump --file-headers "$objdump" | awk -F '[:,]+[[:space:]]+' '$1 == "architecture" { print $2 }')"; \
+        ARCH="$(dpkg --print-architecture)"; \
         case "${ARCH}" in \
            aarch64|arm64) \
-             ESUM='31dba70ba928c78c20d62049ac000f79f7a7ab11f9d9c11e703f52d60aa64f93'; \
-             BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.7_6.tar.gz'; \
+             ESUM='95716d04bdfc8b10c94f4448ea8d57a3ba872d98b53c752e4c6b48f1c95bc582'; \
+             BINARY_URL='https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25%2B36/OpenJDK25U-jdk_aarch64_linux_hotspot_25_36.tar.gz'; \
              ;; \
-          amd64|i386:x86-64) \
-            ESUM='974d3acef0b7193f541acb61b76e81670890551366625d4f6ca01b91ac152ce0'; \
-            BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_x64_linux_hotspot_21.0.7_6.tar.gz'; \
+          amd64|x86_64) \
+            ESUM='ee04de95ab9da7287d40bd2173076ecc2a6dd662f007bedfc6eb0380c0ef90e8'; \
+            BINARY_URL='https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25%2B36/OpenJDK25U-jdk_x64_linux_hotspot_25_36.tar.gz'; \
             ;; \
-           ppc64el|powerpc:common64) \
-             ESUM='2ddc0dc14b07d9e853875aac7f84c23826fff18b9cea618c93efe0bcc8f419c2'; \
-             BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.7_6.tar.gz'; \
+           ppc64el|ppc64le) \
+             ESUM='b060bb12b3a192a0599f03ebb9495492f78c48cb61e291e336a8b00e7798ffb0'; \
+             BINARY_URL='https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25%2B36/OpenJDK25U-jdk_ppc64le_linux_hotspot_25_36.tar.gz'; \
              ;; \
            *) \
              echo "Unsupported architecture: ${ARCH}"; \
@@ -87,8 +91,29 @@ RUN set -eux; \
     	      --directory "/usr/local/java" \
     	      --strip-components 1 \
     	      --no-same-owner \
-    	  ; \
+   	  ; \
     rm -f /tmp/openjdk.tar.gz /usr/local/java/lib/src.zip;
+
+# Install s6-overlay with checksum verification
+RUN set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    case "${ARCH}" in \
+        aarch64|arm64) S6_ARCH="aarch64";; \
+        amd64|x86_64) S6_ARCH="x86_64";; \
+        ppc64el|ppc64le) S6_ARCH="ppc64le";; \
+        *) echo "Unsupported s6-overlay architecture: ${ARCH}"; exit 1;; \
+    esac; \
+    NOARCH_URL="https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz"; \
+    ARCH_URL="https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz"; \
+    curl -LfsSo /tmp/s6-overlay-noarch.tar.xz "${NOARCH_URL}"; \
+    curl -LfsSo /tmp/s6-overlay-noarch.tar.xz.sha256 "${NOARCH_URL}.sha256"; \
+    curl -LfsSo /tmp/s6-overlay-${S6_ARCH}.tar.xz "${ARCH_URL}"; \
+    curl -LfsSo /tmp/s6-overlay-${S6_ARCH}.tar.xz.sha256 "${ARCH_URL}.sha256"; \
+    (cd /tmp && sha256sum -c s6-overlay-noarch.tar.xz.sha256); \
+    (cd /tmp && sha256sum -c s6-overlay-${S6_ARCH}.tar.xz.sha256); \
+    tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz; \
+    tar -C / -Jxpf /tmp/s6-overlay-${S6_ARCH}.tar.xz; \
+    rm -f /tmp/s6-overlay-noarch.tar.xz /tmp/s6-overlay-noarch.tar.xz.sha256 /tmp/s6-overlay-${S6_ARCH}.tar.xz /tmp/s6-overlay-${S6_ARCH}.tar.xz.sha256
 
 RUN echo >> /etc/sudoers && \
     echo "%hedera ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -100,7 +125,8 @@ RUN groupadd --gid 2000 hedera && \
     chown -R hedera:hedera /opt/hgcapp
 
 # Create Application Folders
-RUN mkdir -p "/opt/hgcapp/accountBalances" && \
+RUN mkdir -p "/opt/hgcapp" && \
+    mkdir -p "/opt/hgcapp/accountBalances" && \
     mkdir -p "/opt/hgcapp/eventsStreams" && \
     mkdir -p "/opt/hgcapp/recordStreams" && \
     mkdir -p "/opt/hgcapp/services-hedera" && \
@@ -114,11 +140,12 @@ RUN mkdir -p "/opt/hgcapp/accountBalances" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/saved" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/tmp" && \
     mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/data/upgrade" && \
-    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output"
+    mkdir -p "/opt/hgcapp/services-hedera/HapiApp2.0/output" && \
+    mkdir -p "/var/log/network-node" && \
+    chown 2000:2000 "/var/log/network-node"
 
 # Add the entrypoint script and systemd service file
 ADD entrypoint.sh /opt/hgcapp/services-hedera/HapiApp2.0/
-ADD network-node.service /usr/lib/systemd/system/
 
 # Ensure proper file permissions
 RUN chmod -R +x /opt/hgcapp/services-hedera/HapiApp2.0/entrypoint.sh && \
@@ -135,8 +162,28 @@ RUN chown -R 2000:2000 /etc/network-node && \
     chmod -R +x /etc/network-node/startup/stage_files.sh && \
     chmod -R +x /etc/network-node/env/application.env
 
+# Copy s6 overlay rootfs additions
+COPY rootfs/ /
+
+RUN chmod -R +x /etc/cont-init.d \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-autostart/up \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/run \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node/finish \
+    && chmod +x /etc/s6-overlay/s6-rc.d/network-node-log/run \
+    && chmod +x /etc/s6-overlay/scripts/network-node-autostart \
+    && chmod +x /etc/s6-overlay/scripts/network-node-status \
+    && chmod +x /command/network-node-lifecycle
+
 # Expose TCP/UDP Port Definitions
 EXPOSE 50111/tcp 50211/tcp 50212/tcp
 
+# Basic service health check via s6 supervisor state.
+# Keep this supervisor-only to preserve current behavior and avoid failing
+# health checks during JVM warm-up; the helper supports full runtime checks too.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD /etc/s6-overlay/scripts/network-node-status --supervisor-only --quiet || exit 1
+
 # Set Final Working Directory and User
 WORKDIR "/opt/hgcapp"
+
+ENTRYPOINT ["/init"]

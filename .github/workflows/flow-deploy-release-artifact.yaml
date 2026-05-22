@@ -136,14 +136,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: step-security/setup-buildx-action@f931205d68723ad9589fd2a7e2ece238bf9de341 # v4.0.0
 
-      - name: Build Docker Image (ubi8-init-dind)
-        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
-        with:
-          context: docker/ubi8-init-dind
-          platforms: linux/amd64, linux/arm64
-          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
-          tags: ghcr.io/${{ github.repository }}/ubi8-init-dind:${{ needs.prepare-release.outputs.version }}
-
       - name: Build Docker Image (ubi8-s6-java21)
         uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
         with:
@@ -151,14 +143,6 @@ jobs:
           platforms: linux/amd64, linux/arm64
           push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
           tags: ghcr.io/${{ github.repository }}/ubi8-s6-java21:${{ needs.prepare-release.outputs.version }}
-
-      - name: Build Docker Image (ubi8-init-java25)
-        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
-        with:
-          context: docker/ubi8-init-java25
-          platforms: linux/amd64, linux/arm64
-          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
-          tags: ghcr.io/${{ github.repository }}/ubi8-init-java25:${{ needs.prepare-release.outputs.version }}
 
       - name: Build Docker Image (ubi8-s6-java25)
         uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
@@ -183,6 +167,14 @@ jobs:
           platforms: linux/amd64, linux/arm64
           push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
           tags: ghcr.io/${{ github.repository }}/backup-uploader:${{ needs.prepare-release.outputs.version }}
+
+      - name: Build Docker Image (debian-s6-java25)
+        uses: step-security/docker-build-push-action@846549baaf047e867d038826129a64d81df0f704 # v7.1.0
+        with:
+          context: docker/debian-s6-java25
+          platforms: linux/amd64, linux/arm64
+          push: ${{ github.event.inputs.dry-run-enabled != 'true' }}
+          tags: ghcr.io/${{ github.repository }}/debian-s6-java25:${{ needs.prepare-release.outputs.version }}
 
   create-github-release:
     name: Github / Release
