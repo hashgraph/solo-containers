@@ -57,6 +57,7 @@ RUN apt-get update && \
         xz-utils \
         ca-certificates \
         curl \
+        procps \
         zip \
         unzip \
         sudo && \
