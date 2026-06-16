@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-FROM dtzar/helm-kubectl:4.2.0@sha256:2d9159438b0d791e7082ef5c3884f68dcda9d99d44f4fdca4df5fa7206cc80b6
+FROM dtzar/helm-kubectl:4.2.1@sha256:805c3e286380b919e10b5fc799f99f41334a5ae9d32b0c94ce1f6714d9737f1e
 
 ENV BATS_HOME=/bats
 
