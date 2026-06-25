@@ -1,2 +1,0 @@
-#!/command/execlineb -P
-s6-setuidgid hedera s6-log -b -- t /var/log/network-node
